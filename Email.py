@@ -104,6 +104,7 @@ for index, row in df.iterrows():
                 print(f"File {file_path} not found. Skipping attachment.")
 
             server.sendmail(your_email, recipient_email, msg.as_string())
+            df.at[index, 'Status'] = 'Selected'
             print(f"Email sent to {first_name} at {company_name}")
             break
         elif send_email == 'n':
@@ -111,5 +112,5 @@ for index, row in df.iterrows():
             body=generate_email(company_name=company_name, first_name=first_name)
         else:
             print("Invalid input. Please enter 'y' to send or 'n' to create another email.")
-            
+df.to_csv('sponsors.csv', index=False)
 server.quit()
