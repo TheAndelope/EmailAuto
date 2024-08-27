@@ -127,13 +127,13 @@ for index, row in df.iterrows():
     subject = f"Why {company_name} Should Sponsor Us"
     body = generate_email(company_name=company_name, first_name=first_name)
 
+    print(f"\nSubject: {subject}")
+    print(f"To: {recipient_email}")
+    print(f"Body:\n{body}")
+    
     while True:
 
-        print(f"\nSubject: {subject}")
-        print(f"To: {recipient_email}")
-        print(f"Body:\n{body}")
-
-        send_email = input("Do you want to send this email? ( y / e / r / skip / hw ): ").strip().lower()
+        send_email = input("Do you want to send this email? ( yes (y) | edit (e) | regenerate (r) | skip (s) | handwrite (h) ): ").strip().lower()
         
         if send_email == 'y' or send_email == 'yes':
             send_email = input("Are you sure? (y/n): ").strip().lower()
@@ -153,7 +153,10 @@ for index, row in df.iterrows():
                         part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(file_path)}')
                         msg.attach(part)
                 except FileNotFoundError:
-                    print(f"File {file_path} not found. Skipping attachment.")
+                    for i in range(0,100):
+                        print(f"DONT WORRY NO EMAIL WAS SENT! File {file_path} not found. You may have named the Sponsorship package incorrectly, check name with line 147 (case sensitive) or ask Andy. Skip entry for now if needed")
+                        print('\n')
+                    break
 
                 server.sendmail(your_email, recipient_email, msg.as_string())
                 df.at[index, 'Status'] = 'Review'
@@ -166,17 +169,28 @@ for index, row in df.iterrows():
                 break
             else:
                 pass
+
         elif send_email == 'e' or send_email == 'edit':
             body = edit_email_body(body)
+            print(f"\nSubject: {subject}")
+            print(f"To: {recipient_email}")
+            print(f"Body:\n{body}")
+
         elif send_email == 'r' :
             body= generate_email(company_name=company_name, first_name=first_name)
+            print(f"\nSubject: {subject}")
+            print(f"To: {recipient_email}")
+            print(f"Body:\n{body}")
+
         elif send_email == 's' or send_email == 'skip':
             break
+
         elif send_email == 'h' or send_email == 'hw' or send_email == 'handwrite':
             df.at[index, 'Status'] = 'Handwrite'
             cell = sheet.find(row['Company Name'])
             sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Handwrite')
             break
+
         else:
             print("Invalid input. Please enter 'y' to send or 'n' to create another email.")
 
