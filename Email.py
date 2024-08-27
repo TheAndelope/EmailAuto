@@ -58,7 +58,7 @@ server.starttls()
 server.login(your_email, your_password)
 
 def generate_text(company, model="gpt-4o-mini", max_tokens=300):
-    messages = [{"role": "system", "content": "You are a member of a tech startup called the Neo Developer League and are explaining to a company why your company's values align with theirs and be specific. The general idea of Neo Dev is : Neo Developer League is a student-led organization that hosts competitive events created to inspire high school students to pursue engineering and build connections in a fun and competitive way. Also limit answer to ONE paragraph and say it like you just finished explaining the company"}]
+    messages = [{"role": "system", "content": "You are a member of a tech startup called the Neo Developer League and are explaining to a company why your company's values align with theirs and be specific. The general idea of the Neo Developer league is : the Neo Developer League is a student-led organization that hosts competitive events created to inspire high school students to pursue engineering and build connections in a fun and competitive way. Also limit answer to ONE paragraph and say it like you just finished explaining the company"}]
     messages.append({"role": "user", "content": f'Tell me why your company aligns with the values at {company}'})
 
     response = openai.chat.completions.create(
@@ -144,7 +144,7 @@ for index, row in df.iterrows():
                 msg['Subject'] = subject
                 msg.attach(MIMEText(body, 'plain'))
                 
-                file_path = 'NeoDev_Sponsorship_Package.pdf'
+                file_path = 'NeoDev_Sponsorship_Package.pdf' # Check this line with the name of your sponsorship package file
                 try:
                     with open(file_path, 'rb') as file:
                         part = MIMEBase('application', 'octet-stream')
@@ -156,7 +156,7 @@ for index, row in df.iterrows():
                     for i in range(0,100):
                         print(f"DONT WORRY NO EMAIL WAS SENT! File {file_path} not found. You may have named the Sponsorship package incorrectly, check name with line 147 (case sensitive) or ask Andy. Skip entry for now if needed")
                         print('\n')
-                    break
+                    quit()
 
                 server.sendmail(your_email, recipient_email, msg.as_string())
                 df.at[index, 'Status'] = 'Review'
