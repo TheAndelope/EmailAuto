@@ -61,7 +61,7 @@ neodevleague@gmail.com
 
 for index, row in df.iterrows():
     status = row['Status']
-    if status != "Review":
+    if status != "Selected":
         continue
     company_name = row['Company Name']
     first_name = row['First Name']
@@ -104,7 +104,7 @@ for index, row in df.iterrows():
                 print(f"File {file_path} not found. Skipping attachment.")
 
             server.sendmail(your_email, recipient_email, msg.as_string())
-            df.at[index, 'Status'] = 'Selected'
+            df.at[index, 'Status'] = 'Review'
             print(f"Email sent to {first_name} at {company_name}")
             break
         elif send_email == 'n':
