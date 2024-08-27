@@ -7,6 +7,10 @@ r -> regenerates email
 e -> edits email
 s -> skips entry
 h -> sets status to handwrite (indicates the email must be handwritten)
+
+
+Note** When you edit a gui window will apear in a separate window so you might have to select it in navbar
+
 '''
 import pandas as pd
 import smtplib
@@ -75,6 +79,7 @@ def generate_text(company, model="gpt-4o-mini", max_tokens=300):
     )
     return response.choices[0].message.content
 
+#Feel free to use vairables such as first_name or company_name to add to email template
 def generate_email(company_name, first_name):
     body = f"""
 {first_name},
