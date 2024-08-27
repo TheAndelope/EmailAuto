@@ -38,18 +38,7 @@ def generate_text(company, model="gpt-4o-mini", max_tokens=350):
     )
     return response.choices[0].message.content
 
-for index, row in df.iterrows():
-    status = row['Status']
-    company_name = row['Company Name']
-    first_name = row['First Name']
-
-    if first_name.strip() == '':
-        first_name = "To Whom It May Concern"
-    else:
-        first_name = "Dear, " + first_name
-
-    recipient_email = row['Email']
-    subject = f"Why {company_name} Should Sponsor Us"
+def generate_email(company_name, first_name):
     body = f"""
 {first_name},
 
@@ -66,6 +55,23 @@ Andy Duong
 Finance Lead
 neodevleague@gmail.com
     """
+    return body
+
+for index, row in df.iterrows():
+    status = row['Status']
+    if status!="Review":
+        continue
+    company_name = row['Company Name']
+    first_name = row['First Name']
+
+    if first_name.strip() == '':
+        first_name = "To Whom It May Concern"
+    else:
+        first_name = "Dear, " + first_name
+
+    recipient_email = row['Email']
+    subject = f"Why {company_name} Should Sponsor Us"
+    body = generate_email(company_name=company_name, first_name=first_name)
 
     while True:
         print(f"\nSubject: {subject}")
@@ -85,8 +91,8 @@ neodevleague@gmail.com
             print(f"Email sent to {first_name} at {company_name}")
             break
         elif send_email == 'n':
-            print("Here's Another")
-            break
+            body=generate_email(company_name=company_name, first_name=first_name)
+           
         else:
             print("Invalid input. Please enter 'y' to send or 'n' to modify.")
             
