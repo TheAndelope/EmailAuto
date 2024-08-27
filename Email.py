@@ -7,12 +7,6 @@ n -> regenerates email
 skip -> skips entry
 hw -> sets status to handwrite (indicates the email must be handwritten)
 '''
-
-
-
-
-
-
 import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
@@ -22,12 +16,20 @@ from email import encoders
 from dotenv import load_dotenv
 import os
 import openai
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 load_dotenv()
-
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-df = pd.read_csv('sponsors.csv')
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+client = gspread.authorize(creds)
+
+sheet = client.open("Email Test").sheet1
+
+data = sheet.get_all_records()
+df = pd.DataFrame(data)
 
 your_email = os.getenv("EMAIL")
 your_password = os.getenv("PASS")
@@ -123,6 +125,9 @@ for index, row in df.iterrows():
                 server.sendmail(your_email, recipient_email, msg.as_string())
                 df.at[index, 'Status'] = 'Review'
                 print(f"Email sent to {first_name} at {company_name}")
+
+                cell = sheet.find(row['Company Name'])
+                sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Review')
                 break
             else:
                 pass
@@ -133,8 +138,11 @@ for index, row in df.iterrows():
             break
         elif send_email =='hw':
             df.at[index, 'Status'] = 'Handwrite'
+            cell = sheet.find(row['Company Name'])
+            sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Handwrite')
             break
         else:
             print("Invalid input. Please enter 'y' to send or 'n' to create another email.")
+
 df.to_csv('sponsors.csv', index=False)
 server.quit()
