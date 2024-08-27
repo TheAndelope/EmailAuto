@@ -44,21 +44,27 @@ for index, row in df.iterrows():
     status = row['Status']
     company_name = row['Company Name']
     first_name = row['First Name']
+
+    if(first_name.strip()==''):
+        first_name = "To Whom It May Concern"
+    else:
+        first_name = "Dear, " + first_name
+
     recipient_email = row['Email']
     subject = f"Why {company_name} Should Sponsor Us"
     body = f"""
-    Dear {first_name},
+{first_name},
     
-    I hope this message finds you well. We at the Neo Developer League are reaching out to {company_name} because we believe your company aligns with our values and vision for the future. 
-    
+I hope this message finds you well. We at the Neo Developer League are reaching out to {company_name} because we believe your company aligns with our values and vision for the future. 
+
     {generate_text(company={company_name})}
     
-    Thank you for considering our request, and we look forward to the possibility of working together!
+Thank you for considering our request, and we look forward to the possibility of working together!
     
-    Best regards,
-    Andy Duong
-    Finance Lead
-    theandelope16@gmail.com
+Best regards,
+Andy Duong
+Finance Lead
+theandelope16@gmail.com
     """
     
     msg = MIMEMultipart()
