@@ -25,7 +25,7 @@ server.starttls()
 server.login(your_email, your_password)
 
 def generate_text(company, model="gpt-4o-mini", max_tokens=300):
-    messages = [{"role": "system", "content": "You are a member of a tech startup called the Neo Developer League and are explaining to a company why your company's values align with theirs and be specific. The general idea of Neo Dev is : Neo Developer League is a student-led organization that hosts competitive events created to inspire high school students to pursue engineering and build connections in a fun and competitive way. Also limit answer to ONE paragraph"}]
+    messages = [{"role": "system", "content": "You are a member of a tech startup called the Neo Developer League and are explaining to a company why your company's values align with theirs and be specific. The general idea of Neo Dev is : Neo Developer League is a student-led organization that hosts competitive events created to inspire high school students to pursue engineering and build connections in a fun and competitive way. Also limit answer to ONE paragraph and say it like you just finished explaining the company"}]
     messages.append({"role": "user", "content": f'Tell me why your company aligns with the values at {company}'})
 
     response = openai.chat.completions.create(
@@ -82,7 +82,7 @@ for index, row in df.iterrows():
         print(f"To: {recipient_email}")
         print(f"Body:\n{body}")
 
-        send_email = input("Do you want to send this email? (y/n): ").strip().lower()
+        send_email = input("Do you want to send this email? (y/n/end): ").strip().lower()
         
         if send_email == 'y':
             msg = MIMEMultipart()
@@ -110,6 +110,8 @@ for index, row in df.iterrows():
         elif send_email == 'n':
             print("Here's Another")
             body=generate_email(company_name=company_name, first_name=first_name)
+        elif send_email == 'end':
+            break
         else:
             print("Invalid input. Please enter 'y' to send or 'n' to create another email.")
 df.to_csv('sponsors.csv', index=False)
