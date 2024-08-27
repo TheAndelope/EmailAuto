@@ -2,6 +2,8 @@ import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 from dotenv import load_dotenv
 import os
 import openai
@@ -22,7 +24,7 @@ server = smtplib.SMTP(smtp_server, smtp_port)
 server.starttls()
 server.login(your_email, your_password)
 
-def generate_text(company, model="gpt-4o-mini", max_tokens=350):
+def generate_text(company, model="gpt-4o-mini", max_tokens=300):
     messages = [{"role": "system", "content": "You are a member of a tech startup called the Neo Developer League and are explaining to a company why your company's values align with theirs and be specific. The general idea of Neo Dev is : Neo Developer League is a student-led organization that hosts competitive events created to inspire high school students to pursue engineering and build connections in a fun and competitive way. Also limit answer to ONE paragraph"}]
     messages.append({"role": "user", "content": f'Tell me why your company aligns with the values at {company}'})
 
@@ -59,12 +61,14 @@ neodevleague@gmail.com
 
 for index, row in df.iterrows():
     status = row['Status']
-    if status!="Review":
+    if status != "Review":
         continue
     company_name = row['Company Name']
     first_name = row['First Name']
 
-    if first_name.strip() == '':
+    if not (isinstance(first_name, str)):
+        first_name = "To Whom It May Concern"
+    elif first_name.strip()=='':
         first_name = "To Whom It May Concern"
     else:
         first_name = "Dear, " + first_name
@@ -87,13 +91,25 @@ for index, row in df.iterrows():
             msg['Subject'] = subject
             msg.attach(MIMEText(body, 'plain'))
             
+            file_path = 'NeoDev_Sponsorship_Package.pdf'
+
+            try:
+                with open(file_path, 'rb') as file:
+                    part = MIMEBase('application', 'octet-stream')
+                    part.set_payload(file.read())
+                    encoders.encode_base64(part)
+                    part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(file_path)}')
+                    msg.attach(part)
+            except FileNotFoundError:
+                print(f"File {file_path} not found. Skipping attachment.")
+
             server.sendmail(your_email, recipient_email, msg.as_string())
             print(f"Email sent to {first_name} at {company_name}")
             break
         elif send_email == 'n':
+            print("Here's Another")
             body=generate_email(company_name=company_name, first_name=first_name)
-           
         else:
-            print("Invalid input. Please enter 'y' to send or 'n' to modify.")
+            print("Invalid input. Please enter 'y' to send or 'n' to create another email.")
             
 server.quit()
