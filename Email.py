@@ -2,6 +2,8 @@
 Auto Email Program
 By: Andy Duong
 //Description\\
+
+Actions
 y -> sends email
 r -> regenerates email
 e -> edits email
@@ -9,7 +11,7 @@ s -> skips entry
 h -> sets status to handwrite (indicates the email must be handwritten)
 
 
-Note** When you edit a gui window will apear in a separate window so you might have to select it in navbar
+Note** When you edit a gui window will apear in a separate window so you might have to select it in taskbar
 
 '''
 import pandas as pd
@@ -43,7 +45,7 @@ name=""
 while True:
     name = input("What Is Your Full Name (Your name WILL be included on the current email template)? ")
     if name.strip()!="":
-        choice = input(f'Are you sure {name} is your real full name (y/n)')
+        choice = input(f'Are you sure {name} is your full real name (y/n) ')
         if choice=='y':
             break
         elif choice=='n':
