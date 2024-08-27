@@ -38,9 +38,16 @@ import tkinter as tk
 from tkinter import scrolledtext
 from datetime import datetime
 
+
 name=""
-while name.strip()=="":
-    name = input("What Is Your Full Name? ")
+while True:
+    name = input("What Is Your Full Name (Your name WILL be included on the current email template)? ")
+    if name.strip()!="":
+        choice = input(f'Are you sure {name} is your real full name (y/n)')
+        if choice=='y':
+            break
+        elif choice=='n':
+            pass
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -161,7 +168,7 @@ for index, row in df.iterrows():
                         msg.attach(part)
                 except FileNotFoundError:
                     for i in range(0,100):
-                        print(f"DONT WORRY NO EMAIL WAS SENT! File {file_path} not found. You may have named the Sponsorship package incorrectly, check name with line 147 (case sensitive) or ask Andy. Skip entry for now if needed")
+                        print(f"DONT WORRY NO EMAIL WAS SENT! File {file_path} not found. You may have named the Sponsorship package incorrectly, check name with line 154 (case sensitive) or ask Andy. Skip entry for now if needed")
                         print('\n')
                     quit()
 
