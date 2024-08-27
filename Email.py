@@ -34,7 +34,9 @@ import tkinter as tk
 from tkinter import scrolledtext
 from datetime import datetime
 
-name = input("What Is Your Name? ")
+name=""
+while name.strip()=="":
+    name = input("What Is Your Full Name? ")
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -77,7 +79,7 @@ def generate_email(company_name, first_name):
     body = f"""
 {first_name},
 
-Hello! I'm Andy Duong, a founder at the NeoDev League, and we're reaching out to collaborate! We’re excited to connect with you as we prepare to launch our first competitive engineering event for high school students this October. We’re expecting 150-200 participants for this one-day event, where teams of students will collaborate on projects to present to a panel of judges. Our organization is focused on sparking collaboration and innovation in high schoolers. Events will allow teams of 8-10 students from various schools in the region to collaborate over an 8 hour work period to create a project and present it to a panel of judges.  
+Hello! I'm {name}, a founder at the NeoDev League, and we're reaching out to collaborate! We’re excited to connect with you as we prepare to launch our first competitive engineering event for high school students this October. We’re expecting 150-200 participants for this one-day event, where teams of students will collaborate on projects to present to a panel of judges. Our organization is focused on sparking collaboration and innovation in high schoolers. Events will allow teams of 8-10 students from various schools in the region to collaborate over an 8 hour work period to create a project and present it to a panel of judges.  
 
 {generate_text(company=company_name)}
 
