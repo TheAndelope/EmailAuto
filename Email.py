@@ -3,9 +3,10 @@ Auto Email Program
 By: Andy Duong
 //Description\\
 y -> sends email
-n -> regenerates email
-skip -> skips entry
-hw -> sets status to handwrite (indicates the email must be handwritten)
+r -> regenerates email
+e -> edits email
+s -> skips entry
+h -> sets status to handwrite (indicates the email must be handwritten)
 '''
 import pandas as pd
 import smtplib
@@ -18,6 +19,22 @@ import os
 import openai
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import pandas as pd
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+from dotenv import load_dotenv
+import os
+import openai
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import tkinter as tk
+from tkinter import scrolledtext
+from datetime import datetime
+
+name = input("What Is Your Name? ")
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -27,7 +44,6 @@ creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", sco
 client = gspread.authorize(creds)
 
 sheet = client.open("Email Test").sheet1
-
 data = sheet.get_all_records()
 df = pd.DataFrame(data)
 
@@ -76,6 +92,25 @@ neodevleague@gmail.com
     """
     return body
 
+def edit_email_body(initial_body):
+    def save_and_close():
+        global email_body
+        email_body = text_area.get("1.0", tk.END).strip()
+        root.destroy()
+
+    root = tk.Tk()
+    root.title("Edit Email Body")
+
+    text_area = scrolledtext.ScrolledText(root, wrap=tk.WORD, width=80, height=20)
+    text_area.insert(tk.INSERT, initial_body)
+    text_area.pack(padx=10, pady=10)
+
+    save_button = tk.Button(root, text="Save and Close", command=save_and_close)
+    save_button.pack(pady=10)
+
+    root.mainloop()
+    return email_body
+
 for index, row in df.iterrows():
     status = row['Status']
     if status != "Selected":
@@ -83,27 +118,26 @@ for index, row in df.iterrows():
     company_name = row['Company Name']
     first_name = row['First Name']
 
-    if not (isinstance(first_name, str)):
-        first_name = "To Whom It May Concern"
-    elif first_name.strip()=='':
+    if not (isinstance(first_name, str)) or first_name.strip() == '':
         first_name = "To Whom It May Concern"
     else:
-        first_name = "Dear, " + first_name
+        first_name = "Dear " + first_name
 
     recipient_email = row['Email']
     subject = f"Why {company_name} Should Sponsor Us"
     body = generate_email(company_name=company_name, first_name=first_name)
 
     while True:
+
         print(f"\nSubject: {subject}")
         print(f"To: {recipient_email}")
         print(f"Body:\n{body}")
 
-        send_email = input("Do you want to send this email? (y/n/skip/hw): ").strip().lower()
+        send_email = input("Do you want to send this email? ( y / e / r / skip / hw ): ").strip().lower()
         
-        if send_email == 'y':
+        if send_email == 'y' or send_email == 'yes':
             send_email = input("Are you sure? (y/n): ").strip().lower()
-            if send_email =='y':
+            if send_email == 'y' or send_email == 'yes':
                 msg = MIMEMultipart()
                 msg['From'] = your_email
                 msg['To'] = recipient_email
@@ -111,7 +145,6 @@ for index, row in df.iterrows():
                 msg.attach(MIMEText(body, 'plain'))
                 
                 file_path = 'NeoDev_Sponsorship_Package.pdf'
-
                 try:
                     with open(file_path, 'rb') as file:
                         part = MIMEBase('application', 'octet-stream')
@@ -128,15 +161,18 @@ for index, row in df.iterrows():
 
                 cell = sheet.find(row['Company Name'])
                 sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Review')
+                sheet.update_cell(cell.row, df.columns.get_loc('Date Sent') + 1, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                sheet.update_cell(cell.row, df.columns.get_loc('Person') + 1, name)
                 break
             else:
                 pass
-        elif send_email == 'n':
-            print("Here's Another")
-            body=generate_email(company_name=company_name, first_name=first_name)
-        elif send_email == 'skip':
+        elif send_email == 'e' or send_email == 'edit':
+            body = edit_email_body(body)
+        elif send_email == 'r' :
+            body= generate_email(company_name=company_name, first_name=first_name)
+        elif send_email == 's' or send_email == 'skip':
             break
-        elif send_email =='hw':
+        elif send_email == 'h' or send_email == 'hw' or send_email == 'handwrite':
             df.at[index, 'Status'] = 'Handwrite'
             cell = sheet.find(row['Company Name'])
             sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Handwrite')
@@ -146,3 +182,4 @@ for index, row in df.iterrows():
 
 df.to_csv('sponsors.csv', index=False)
 server.quit()
+
