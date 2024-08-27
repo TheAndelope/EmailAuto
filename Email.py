@@ -1,3 +1,18 @@
+'''
+Auto Email Program
+By: Andy Duong
+//Description\\
+y -> sends email
+n -> regenerates email
+skip -> skips entry
+hw -> sets status to handwrite (indicates the email must be handwritten)
+'''
+
+
+
+
+
+
 import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
@@ -82,35 +97,42 @@ for index, row in df.iterrows():
         print(f"To: {recipient_email}")
         print(f"Body:\n{body}")
 
-        send_email = input("Do you want to send this email? (y/n/end): ").strip().lower()
+        send_email = input("Do you want to send this email? (y/n/skip/hw): ").strip().lower()
         
         if send_email == 'y':
-            msg = MIMEMultipart()
-            msg['From'] = your_email
-            msg['To'] = recipient_email
-            msg['Subject'] = subject
-            msg.attach(MIMEText(body, 'plain'))
-            
-            file_path = 'NeoDev_Sponsorship_Package.pdf'
+            send_email = input("Are you sure? (y/n): ").strip().lower()
+            if send_email =='y':
+                msg = MIMEMultipart()
+                msg['From'] = your_email
+                msg['To'] = recipient_email
+                msg['Subject'] = subject
+                msg.attach(MIMEText(body, 'plain'))
+                
+                file_path = 'NeoDev_Sponsorship_Package.pdf'
 
-            try:
-                with open(file_path, 'rb') as file:
-                    part = MIMEBase('application', 'octet-stream')
-                    part.set_payload(file.read())
-                    encoders.encode_base64(part)
-                    part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(file_path)}')
-                    msg.attach(part)
-            except FileNotFoundError:
-                print(f"File {file_path} not found. Skipping attachment.")
+                try:
+                    with open(file_path, 'rb') as file:
+                        part = MIMEBase('application', 'octet-stream')
+                        part.set_payload(file.read())
+                        encoders.encode_base64(part)
+                        part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(file_path)}')
+                        msg.attach(part)
+                except FileNotFoundError:
+                    print(f"File {file_path} not found. Skipping attachment.")
 
-            server.sendmail(your_email, recipient_email, msg.as_string())
-            df.at[index, 'Status'] = 'Review'
-            print(f"Email sent to {first_name} at {company_name}")
-            break
+                server.sendmail(your_email, recipient_email, msg.as_string())
+                df.at[index, 'Status'] = 'Review'
+                print(f"Email sent to {first_name} at {company_name}")
+                break
+            else:
+                pass
         elif send_email == 'n':
             print("Here's Another")
             body=generate_email(company_name=company_name, first_name=first_name)
-        elif send_email == 'end':
+        elif send_email == 'skip':
+            break
+        elif send_email =='hw':
+            df.at[index, 'Status'] = 'Handwrite'
             break
         else:
             print("Invalid input. Please enter 'y' to send or 'n' to create another email.")
