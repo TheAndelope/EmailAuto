@@ -131,6 +131,7 @@ for index, row in df.iterrows():
     status = row['Status']
     if status != "Selected":
         continue
+    df.at[index, 'Status'] = 'In Process'
     cell = sheet.find(row['Company Name'])
     sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'In Process')
     company_name = row['Company Name']
@@ -174,15 +175,18 @@ for index, row in df.iterrows():
                         print(f"DONT WORRY NO EMAIL WAS SENT! File {file_path} not found. You may have named the Sponsorship package incorrectly, check name with line 154 (case sensitive) or ask Andy. Skip entry for now if needed")
                         print('\n')
                     quit()
+                status = row['Status']
+                if status=="In Process":
+                    server.sendmail(your_email, recipient_email, msg.as_string())
+                    df.at[index, 'Status'] = 'Review'
+                    print(f"Email sent to {first_name} at {company_name}")
 
-                server.sendmail(your_email, recipient_email, msg.as_string())
-                df.at[index, 'Status'] = 'Review'
-                print(f"Email sent to {first_name} at {company_name}")
-
-                cell = sheet.find(row['Company Name'])
-                sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Review')
-                sheet.update_cell(cell.row, df.columns.get_loc('Date Sent') + 1, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                sheet.update_cell(cell.row, df.columns.get_loc('Person') + 1, name)
+                    cell = sheet.find(row['Company Name'])
+                    sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Review')
+                    sheet.update_cell(cell.row, df.columns.get_loc('Date Sent') + 1, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                    sheet.update_cell(cell.row, df.columns.get_loc('Person') + 1, name)
+                else:
+                    print("Someone else already sent an email or changed the status value while in process")
                 break
             else:
                 pass
@@ -200,8 +204,11 @@ for index, row in df.iterrows():
             print(f"Body:\n{body}")
 
         elif send_email == 's' or send_email == 'skip':
-            cell = sheet.find(row['Company Name'])
-            sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Selected')
+            status = row['Status']
+            if status=='In Process':
+                df.at[index, 'Status'] = 'Selected'
+                cell = sheet.find(row['Company Name'])
+                sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Selected')
             break
 
         elif send_email == 'h' or send_email == 'hw' or send_email == 'handwrite':
