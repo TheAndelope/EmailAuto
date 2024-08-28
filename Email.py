@@ -45,7 +45,7 @@ name=""
 while True:
     name = input("What Is Your Full Name (Your name WILL be included on the current email template)? ")
     if name.strip()!="":
-        choice = input(f'Are you sure {name} is your full real name (y/n) ')
+        choice = input(f'Are you sure {name} is your full real name (y/n) ').strip().lower()
         if choice=='y':
             break
         elif choice=='n':
@@ -131,9 +131,10 @@ for index, row in df.iterrows():
     status = row['Status']
     if status != "Selected":
         continue
+    cell = sheet.find(row['Company Name'])
+    sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'In Process')
     company_name = row['Company Name']
     first_name = row['First Name']
-
     if not (isinstance(first_name, str)) or first_name.strip() == '':
         first_name = "To Whom It May Concern"
     else:
@@ -199,6 +200,8 @@ for index, row in df.iterrows():
             print(f"Body:\n{body}")
 
         elif send_email == 's' or send_email == 'skip':
+            cell = sheet.find(row['Company Name'])
+            sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Selected')
             break
 
         elif send_email == 'h' or send_email == 'hw' or send_email == 'handwrite':
@@ -212,4 +215,3 @@ for index, row in df.iterrows():
 
 df.to_csv('sponsors.csv', index=False)
 server.quit()
-
