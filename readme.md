@@ -1,76 +1,95 @@
-Here's a fun and engaging README for your email automation application!
+# 📧 Auto Email Program
+
+Welcome to the **Auto Email Program**! This application automatically sends personalized emails using data from a Google Spreadsheet. With a few simple actions, you can generate, edit, and send emails to your contacts. This program is designed to streamline your communication, especially for sponsorship outreach. 🚀
 
 ---
 
-# 📧 Email Automation App 🚀
-
-Welcome to the **Email Automation App**! 🎉 This tool allows you to send personalized emails to a list of recipients from a spreadsheet with just a few clicks. Say goodbye to manual emails! 😎
-
-## ✨ Features
-- **Spreadsheet Integration** 📊: Upload a spreadsheet with recipient details and custom email content.
-- **Automated Email Sending** 📬: Automatically send personalized emails to everyone on your list.
-- **Customizable Templates** 🖋️: Create beautiful and customizable email templates to match your branding.
-- **Error Handling** 🚨: Logs errors and provides feedback if any emails fail to send.
-- **Secure** 🔒: Keep your email data safe and secure.
-
-## 🔧 Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/email-automation-app.git
-   ```
-2. Navigate into the project directory:
-   ```bash
-   cd email-automation-app
-   ```
-3. Install the dependencies:
-   ```bash
-   npm install
-   ```
-4. Set up your `.env` file with the following environment variables:
-   ```
-   EMAIL_SERVICE=<your-email-service>
-   EMAIL_USER=<your-email-address>
-   EMAIL_PASS=<your-email-password>
-   ```
-
-## 🚀 Usage
-
-1. Prepare your spreadsheet file (CSV or Excel) with the following columns:
-   - `Name` (recipient name)
-   - `Email` (recipient email)
-   - `Message` (personalized message for the recipient)
-
-2. Run the app:
-   ```bash
-   npm start
-   ```
-
-3. Upload your spreadsheet file when prompted, and watch the magic happen! ✨
-
-## 🛠️ Configuration
-
-You can customize the email templates in the `templates/` folder. Use your preferred HTML or plain text email format. Make sure to add placeholders like `{name}` or `{message}` to personalize each email.
-
-## 🤔 FAQ
-
-**Q: What email services can I use?**
-
-A: You can use any email service that supports SMTP! Popular services include Gmail, Outlook, and Yahoo.
-
-**Q: Is my data safe?**
-
-A: Yes, all email credentials are stored securely using environment variables, and we do not log or store sensitive information.
-
-## 💬 Support
-
-If you have any issues or questions, feel free to open an issue on GitHub or contact me at [email@example.com]. 
-
-## 🏆 Contributing
-
-Contributions are welcome! Feel free to fork the repository and submit a pull request. Please make sure your changes are well-tested.
+## 🔧 Features
+- **Automated email generation** using GPT-based templates.
+- **Personalized email content** based on company names.
+- **Edit and regenerate** emails on the go.
+- **Attach sponsorship packages** to emails.
+- **Track status** updates directly in Google Sheets.
 
 ---
 
-Enjoy automating your emails! 🎉📧
+## 🚀 How It Works
 
+### Actions:
+| Key | Action |
+| --- | ------ |
+| `y` | Sends email 📧 |
+| `r` | Regenerates email 🔄 |
+| `e` | Edits email 📝 |
+| `s` | Skips entry ⏩ |
+| `h` | Marks email to be handwritten ✍️ |
+
+When editing, a separate GUI window will pop up, which you may need to select from the taskbar.
+
+---
+
+## ⚙️ Setup Instructions
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-repo/auto-email-program.git
+   cd auto-email-program
+   ```
+
+2. **Install dependencies**:
+   Make sure you have Python 3 installed. Then install required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set up environment variables**:
+   Create a `.env` file in the root directory:
+   ```env
+   EMAIL=your_email@example.com
+   PASS=your_email_password
+   OPENAI_API_KEY=your_openai_api_key
+   ```
+
+4. **Configure Google Sheets**:
+   - Set up Google Sheets API and download the `credentials.json` file.
+   - Make sure to have a spreadsheet named **"Email Test"** with columns: `Company Name`, `First Name`, `Email`, `Status`, `Date Sent`, and `Person`.
+
+---
+
+## ✨ Usage
+
+1. **Start the program**:
+   ```bash
+   python auto_email.py
+   ```
+
+2. **Enter your full name**:
+   Your name will be included in the email template. Confirm your input.
+
+3. **Email generation and sending**:
+   - The program will generate and display the email.
+   - You can choose to send the email, edit, regenerate, skip, or mark for handwritten follow-up.
+
+4. **Email status updates**:
+   The program will update the `Status`, `Date Sent`, and `Person` fields in the Google Spreadsheet after each email is processed.
+
+---
+
+## 📝 Customization
+
+- **Email Templates**:
+  The default email template is customizable in the `generate_email` function. Adjust the body to suit your needs.
+  
+- **Attachments**:
+  Ensure the sponsorship package or any other file you want to send is named correctly (`NeoDev_Sponsorship_Package.pdf`).
+
+---
+
+## 🛠️ Troubleshooting
+
+- **File Not Found**: If the attachment is missing, the program will notify you and ask you to skip the entry.
+- **Email Errors**: If an email fails to send, the program will log the error for you to review.
+
+---
+
+Enjoy your automated emailing experience! 🎉 If you encounter any issues, feel free to reach out!
