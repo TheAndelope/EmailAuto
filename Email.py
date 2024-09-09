@@ -41,7 +41,7 @@ your_password = os.getenv("PASS")
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
 client = gspread.authorize(creds)
-sheet = client.open("Email Test").sheet1
+sheet = client.open("The Real Sponsorship Sheet").sheet1
 data = sheet.get_all_records()
 df = pd.DataFrame(data)
 
@@ -60,8 +60,8 @@ while True:
         if choice == 'y':
             break
 
-def generate_text(company, model="gpt-4o-mini", max_tokens=300):
-    messages = [{"role": "system", "content": "You are a member of a tech startup called the Neo Developer League and are explaining to a company why your company's values align with theirs and be specific. The general idea of the Neo Developer League is: the Neo Developer League is a student-led organization that hosts competitive events created to inspire high school students to pursue engineering and build connections in a fun and competitive way. Also limit answer to ONE paragraph and say it like you just finished explaining the company. Also speak as a team (use 'we)"}]
+def generate_text(company, model="gpt-4o-mini", max_tokens=150):
+    messages = [{"role": "system", "content": "You are a member of a tech startup called the Neo Developer League and are explaining to a company why your company's values align with theirs and be specific. The general idea of the Neo Developer League is: the Neo Developer League is a student-led organization that hosts competitive events created to inspire high school students to pursue engineering and build connections in a fun and competitive way. Also limit answer to TWO sentences and say it like you just finished explaining the company. Also speak as a team (use 'we)"}]
     messages.append({"role": "user", "content": f'Tell me why your company aligns with the values at {company}'})
 
     response = openai.chat.completions.create(
@@ -82,10 +82,12 @@ def generate_email(company_name, first_name):
 <head></head>
 <body>
 <p>{first_name},</p>
-<p>Hello! I'm {name}, a founder at the NeoDev League, and we're reaching out to collaborate! We’re excited to connect with you as we prepare to launch our first competitive engineering event for high school students this October. We’re expecting 150-200 participants for this one-day event, where teams of students will collaborate on projects to present to a panel of judges. Our organization is focused on sparking collaboration and innovation in high schoolers. Events will allow teams of 8-10 students from various schools in the region to collaborate over an 8-hour work period to create a project and present it to a panel of judges.</p>
+<p>I'm {name}, a Founder at <a href="https://neoleague.dev/" target="_blank" rel="noreferrer">NeoDev League</a>, a competitive high school engineering competition. I'm reaching out to connect with {company_name} as we prepare to launch first event for 150-200 participants on October 27. Teams of 8-10 students from various schools in Waterloo Region will collaborate over an 8-hour work period to create a project and present it to a panel of judges.</p>
 <p>{generate_text(company=company_name)}</p>
-<p>We’d love to discuss this further and explore how we can collaborate. Please feel free to reach out with any questions.</p>
-<p>Thank you for your time and consideration.</p>
+<p>You can find our sponsorship package, which lists tier costs and benefits, <a href="https://neoleague.dev/sponsor" target="_blank" rel="noreferrer">attached to this email</a>. NeoDev is powering the next generation of tech innovators to leave a long-lasting impact on the world, and I'd be honoured for {company_name} to be a part of that.</p>
+<p>I'd love to schedule a call to discuss this further, and address any questions you may have.</p>
+<p>Best regards,</p>
+<p>{name.split(' ')[0]}</p>
 <table cellpadding="0" cellspacing="0" border="0" globalstyles="[object Object]" class="table__StyledTable-sc-1avdl6r-0 lmHSv" style="vertical-align: -webkit-baseline-middle; font-size: medium; font-family: Arial;">
     <tbody>
         <tr>
@@ -146,7 +148,7 @@ def generate_email(company_name, first_name):
                             </td>
                             <td style="padding: 0px; vertical-align: middle;">
                                 <h2 color="#000000" class="name__NameContainer-sc-1m457h3-0 csBPEs" style="margin: 0px; font-size: 18px; color: rgb(0, 0, 0); font-weight: 600;">
-                                    <span>The NeoDev</span><span>&nbsp;</span><span>Team</span>
+                                    <span>{name}</span>
                                 </h2>
                                 <p color="#000000" font-size="medium" class="company-details__CompanyContainer-sc-j5pyy8-0 cSOAsl" style="margin: 0px; font-weight: 500; color: rgb(0, 0, 0); font-size: 14px; line-height: 22px;">
                                     <span>Neo Developer League</span>
@@ -278,19 +280,15 @@ for index, row in df.iterrows():
     company_name = row['Company Name']
     first_name = row['First Name']
     if not (isinstance(first_name, str)) or first_name.strip() == '':
-        first_name = "To Whom It May Concern"
+        first_name = "Hi there"
     else:
         first_name = "Dear " + first_name
 
     recipient_email = row['Email']
-    subject = f"Why {company_name} Should Sponsor Us"
+    subject = f"NeoDev League + {company_name} Sponsorship Opportunity"
     body = generate_email(company_name=company_name, first_name=first_name)
     
-    '''
-    print(f"\nSubject: {subject}")
-    print(f"To: {recipient_email}")
-    print(f"Body:\n{body}")
-    '''
+   
     #auto email
     
     try:
@@ -299,7 +297,7 @@ for index, row in df.iterrows():
         print(f"Email sent to {first_name} at {company_name}")
         cell = sheet.find(row['Company Name'])
         sheet.update_cell(cell.row, df.columns.get_loc('Status') + 1, 'Review')
-        sheet.update_cell(cell.row, df.columns.get_loc('Date Sent') + 1, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        sheet.update_cell(cell.row, df.columns.get_loc('Date sent') + 1, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         sheet.update_cell(cell.row, df.columns.get_loc('Person') + 1, name)
     except Exception as e:
         print(f"Failed to send email: {e}")
@@ -307,6 +305,10 @@ for index, row in df.iterrows():
 
     #manual email
     '''
+    print(f"\nSubject: {subject}")
+    print(f"To: {recipient_email}")
+    print(f"Body:\n{body}")
+
     while True:
         send_email_choice = input("Do you want to send this email? (yes (y) | edit (e) | regenerate (r) | skip (s) | handwrite (h)): ").strip().lower()
         
