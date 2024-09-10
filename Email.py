@@ -52,6 +52,7 @@ server = smtplib.SMTP(smtp_server, smtp_port)
 server.starttls()
 server.login(your_email, your_password)
 
+emailCount=0
 name = ""
 while True:
     name = input("What Is Your Full Name (Your name WILL be included on the current email template)? ")
@@ -267,7 +268,7 @@ def send_email(recipient_email, subject, body):
         quit()
     
     server.sendmail(your_email, recipient_email, msg.as_string())
-
+    emailCount+=1
 for index, row in df.iterrows():
     status = row['Status']
     if status != "Selected":
@@ -359,4 +360,5 @@ for index, row in df.iterrows():
     '''
 
 df.to_csv('sponsors.csv', index=False)
+print(f'You have sent {emailCount} emails!')
 server.quit()
